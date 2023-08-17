@@ -10,7 +10,7 @@ import (
 
 func TestAttributes(t *testing.T) {
 	source := []byte(`
-[Text underlined]{.underline}
+[This is *some text*]{.class key="val"} outside text
 `)
 
 	var md = goldmark.New(Enable)

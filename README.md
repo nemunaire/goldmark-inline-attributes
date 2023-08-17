@@ -2,12 +2,14 @@
 
 [GoldMark](https://github.com/yuin/goldmark/) inline attributes extension.
 
+This implements the [`bracketed_spans`](https://pandoc.org/MANUAL.html#extension-bracketed_spans) of pandoc.
+
 ```markdown
-[Attention]{.underline} some text
+[This is *some text*]{.class key="val"} outside text
 ```
 
 ```html
-<p><span class="underline">Attention</span> some text</p>
+<p><span class="class" key="val">This is <em>some text</em></span> outside text</p>
 ```
 
 ```go
