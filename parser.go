@@ -1,6 +1,7 @@
 package attributes
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 
@@ -29,9 +30,10 @@ func (s *attributesParser) Trigger() []byte {
 var attributeBottom = parser.NewContextKey()
 
 func (s *attributesParser) Parse(parent ast.Node, block text.Reader, pc parser.Context) ast.Node {
+	sl, ss := block.Position()
 	line, seg := block.PeekLine()
 
-	if line[0] == '[' {
+	if line[0] == '[' && bytes.Contains(line, []byte("]{")) {
 		pc.Set(attributeBottom, pc.LastDelimiter())
 		return processSpanContentOpen(block, seg.Start, pc)
 	}
@@ -39,6 +41,7 @@ func (s *attributesParser) Parse(parent ast.Node, block text.Reader, pc parser.C
 	// line[0] == ']'
 	tlist := pc.Get(spanContentStateKey)
 	if tlist == nil {
+		block.SetPosition(sl, ss)
 		return nil
 	}
 
@@ -52,11 +55,13 @@ func (s *attributesParser) Parse(parent ast.Node, block text.Reader, pc parser.C
 
 	c := block.Peek()
 	if c != '{' {
+		block.SetPosition(sl, ss)
 		return nil
 	}
 
 	attrs, ok := parser.ParseAttributes(block)
 	if !ok {
+		block.SetPosition(sl, ss)
 		return nil
 	}
 
