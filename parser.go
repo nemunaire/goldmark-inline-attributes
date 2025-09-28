@@ -33,9 +33,13 @@ func (s *attributesParser) Parse(parent ast.Node, block text.Reader, pc parser.C
 	sl, ss := block.Position()
 	line, seg := block.PeekLine()
 
-	if line[0] == '[' && bytes.Contains(line, []byte("]{")) {
-		pc.Set(attributeBottom, pc.LastDelimiter())
-		return processSpanContentOpen(block, seg.Start, pc)
+	if line[0] == '[' {
+		openIdx := bytes.IndexByte(line[1:], '[')
+		closeIdx := bytes.IndexByte(line, ']')
+		if (openIdx < 0 || openIdx > closeIdx) && closeIdx > 0 && closeIdx+1 < len(line) && line[closeIdx+1] == '{' {
+			pc.Set(attributeBottom, pc.LastDelimiter())
+			return processSpanContentOpen(block, seg.Start, pc)
+		}
 	}
 
 	// line[0] == ']'
